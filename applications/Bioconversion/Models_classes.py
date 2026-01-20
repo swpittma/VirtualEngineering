@@ -13,7 +13,7 @@ root_path = os.path.abspath(os.path.join(os.path.dirname(__file__)))
 cwd = os.getcwd()
 
 def make_models_list(options_list, n_models=4, hpc_run=False):
-
+    
     fs_options, pt_options, eh_options, br_options = tuple(options_list)
     # Initialize models
     FS_model = Feedstock(fs_options)
@@ -193,10 +193,48 @@ class Pretreatment:
             raise ValueError(f"Value {a} is outside allowed interval [1, 1440]")
         self.ve.pt_in['final_time'] = 60 * float(a)
 
+    @property
+    def acetylfrac(self):
+        return self.ve.pt_in['acetylfrac']
+    
+    @acetylfrac.setter
+    def acetylfrac(self,a):
+        if not 0 < a < 1:
+            raise ValueError(f"Value {a} is outside allowed interval (0, 1)")
+        self.ve.pt_in['acetylfrac'] = float(a)
+    
+    @property
+    def DAtemp(self):
+        return self.ve.pt_in['deacetylation temperature']
+    
+    @DAtemp.setter
+    def DAtemp(self,a):
+        if not 200 < a < 600:
+            raise ValueError(f"Value {a} is outside allowed interval (200, 600)")
+        self.ve.pt_in['deacetylation temperature'] = float(a)
+    
+    @property
+    def model_type(self):
+        return self.ve.pt_in['model_type']
+
+    @model_type.setter
+    def model_type(self, a):
+        if a not in ['dilute acid', 'deacetylation']:
+            raise ValueError("Invalid value. Allowed options: 'dilute acid', 'deacetylation'")
+        self.ve.pt_in['model_type']=a
+        self.select_run_function()
+    
+    def select_run_function(self):
+        # selected enzymatic hydrolysis model
+        if self.model_type == 'dilute acid':
+            self.run = self.run_pt_dilute_acid
+        elif self.model_type == 'deacetylation':
+            self.run = self.run_pt_deacetylation
+
     ##############################################
     #
     ##############################################
-    def run(self, verbose=True, show_plots=None):
+    def run_pt_dilute_acid(self, verbose=True, show_plots=None):
         """Run pretreatment code specified in 
         pretreatment_model/dolfinx/run_pretreatment.py
 
@@ -226,6 +264,21 @@ class Pretreatment:
             print(f't_final = {self.t_final}')
             return True
         return False
+    
+    def run_pt_deacetylation(self, verbose=True):
+        if verbose:
+            print('\nRunning deacetylation pretreatment')
+        sys.path.append(os.path.join(self.pt_module_path, 'deacetylation_model'))
+        from deacetylation import deacetylate
+        deacetylate(self.ve,verbose,self.show_plots)
+        self.ve.pt_out = {}
+        self.ve.pt_out['X_X']=self.ve.feedstock['xylan_solid_fraction']
+        self.ve.pt_out['X_G']=self.ve.feedstock['glucan_solid_fraction']
+        self.ve.pt_out['conv']=0.0
+        self.ve.pt_out["fis_0"] = self.ve.pt_in['initial_solid_fraction']
+        self.ve.pt_out["rho_f"] = 0.0
+        self.ve.pt_out["rho_x"]=730.0
+        return True
 
 ###################################################################################
 ####
