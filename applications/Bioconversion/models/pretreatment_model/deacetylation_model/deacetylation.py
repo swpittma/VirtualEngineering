@@ -34,61 +34,6 @@ Arc_X = 7e3 # Arrhenius pre-exponent factor for xylan -L/(mol-s)-
 pKa_ace = 4.76
 pK_Naace = 4.76
 
-
-###
-# Typical Composition of Cob Types
-# Corn Husk
-Husk_C = 0.38 # fraction of cellulose -%/100-
-Husk_H = 0.35 # fraction of hemicellulose -%/100- 
-Husk_L = 0.15 # fraction of lignin -%/100-
-Husk_Ep = 0.126 # effective porosity
-Husk_T = 5.5 # tortuosity
-Husk_v = 0.65 # void fraction
-# Corn Cob
-Cob_C = 0.33 # fraction of cellulose -%/100-
-Cob_H = 0.36 # fraction of hemicellulose -%/100- 
-Cob_L = 0.17 # fraction of lignin -%/100-
-Cob_Ep = 0.126 # effective porosity
-Cob_T = 10.3 # tortuosity
-Cob_v = 0.65 # void fraction
-# Corn Stalk
-Stalk_C = 0.40 # fraction of cellulose -%/100-
-Stalk_H = 0.28 # fraction of hemicellulose -%/100- 
-Stalk_L = 0.21 # fraction of lignin -%/100-
-Stalk_Ep = 0.671 # effective porosity
-Stalk_T = 1.36 # tortuosity
-Stalk_v = 0.65 # void fraction
-# Acetyl Groups
-Acy_P = 0.023 #0.023 #0.0223 # weight percentage of acetate in biomass
-# Acy_P = 0.027 # switchgrass
-# Lignin Groups
-Lig_P = 0.153 # weight percentage of lignin in biomass
-# Lig_P = 0.192 # switchgrass
-# Xylan Groups
-Xy_P = 0.213 # corn stover
-# Xy_P = 0.218 # switchgrass
-
-loops = (3,6)
-corn = np.zeros(loops)
-corn[0,0] = Husk_Ep
-corn[0,1] = Husk_T
-corn[0,2] = Husk_v
-corn[0,3] = Husk_C
-corn[0,4] = Husk_H
-corn[0,5] = Husk_L
-corn[1,0] = Cob_Ep
-corn[1,1] = Cob_T
-corn[1,2] = Cob_v
-corn[1,3] = Cob_C
-corn[1,4] = Cob_H
-corn[1,5] = Cob_L
-corn[2,0] = Stalk_Ep
-corn[2,1] = Stalk_T
-corn[2,2] = Stalk_v
-corn[2,3] = Stalk_C
-corn[2,4] = Stalk_H
-corn[2,5] = Stalk_L
-
 ###
 # Molar Mass - g/mol - 
 M_NaOH = 40  
@@ -127,8 +72,8 @@ const[0,11] = M_H
 ###
 # VARIABLE SET INITIAL CONDITIONS 
 t_final = 7200 # Total reaction time -Sec- -120 min- #7200 #5400
-Tf = 365.15 # Operating Fluid Temperature -K- -363.15|90 C- -323.15|50 deg C-
-V_DA = 55 # Volume of Deacetylation Reactor -L- #30 #20
+Tf = 363.15 # Operating Fluid Temperature -K- -363.15|90 C- -323.15|50 deg C-
+V_DA = 20 # Volume of Deacetylation Reactor -L- #30 #20
 pHi_DA = 7 # Inital pH
 pOHi_DA = 14-pHi_DA # Initial pOH
 Part = 0.75 # particle size -inch-
@@ -139,9 +84,16 @@ Decomp = 2 # storage time -unitless- -(months)-
 C_Husk = 10 # corn husk
 C_Cob = 10 # corn cob
 C_Stalk = 10 # corn stalk
-C_NaOH = 9.09 # sodium hydoxide # 4.55 6.36 9.09 # 9.47 5.35 # 2.61 2.01 1.41
+C_NaOH = 2.01 # sodium hydoxide # 4.55 6.36 9.09 # 9.47 5.35 # 2.61 2.01 1.41
 # Biomass
-W_BM = 5000 # biomass -g- #600
+W_BM = 600 # biomass -g- #600 #5000
+
+# Acetyl Groups
+Acy_P = 0.023 #0.023 #0.0223 # weight percentage of acetate in biomass
+# Lignin Groups
+Lig_P = 0.153 # weight percentage of lignin in biomass
+# Xylan Groups
+Xy_P = 0.213 # corn stover
 # Acetyl Groups
 C_acy = W_BM*Acy_P/V_DA # acetyl groups -g/L-2
 Molar_acy = C_acy/M_acy
@@ -158,8 +110,6 @@ Molar_xy = C_xy/M_X
 #######################################
 # Set UP Matrices
 #######################################
-
-### =
 # Calculation Matrix -row 0 g/L- -row 1 mol/L-
 loops=(1,12)
 DAC = np.zeros(loops)
@@ -168,9 +118,9 @@ dM_DAC = np.zeros(loops)
 DAC[0,0] = 0                                               # Acetate
 DAC[0,1] = 0                                               # Acetic Acid
 DAC[0,2] = 0                                               # Sodium Acetate
-DAC[0,3] = (C_Husk*Husk_C)+(C_Cob*Cob_C)+(C_Stalk*Stalk_C) # Cellulose
-DAC[0,4] = C_xy # Hemicellulose
-DAC[0,5] = C_lig # Lignin
+DAC[0,3] = 0                                               # Cellulose
+DAC[0,4] = C_xy                                            # Hemicellulose
+DAC[0,5] = C_lig                                           # Lignin
 DAC[0,6] = C_acy                                           # Acetyl Groups
 DAC[0,7] = 0                                               # Deacetylated Xylan
 DAC[0,8] = C_NaOH                                          # Sodium Hydroxide
@@ -199,40 +149,19 @@ kT_arh_X = Arc_X*np.exp(-Ea_X/(R*Tf)) # -L/(mol-s)-
 
 ###############################################
 ### DEFINE FUNCTION
-def DACy(t, y):
-    # Arrehnius Rate Kinetics
-    # Lignin
-    kT_arh_L = Arc_L*np.exp(-Ea_L/(R*Tf)) # -L/(mol-s)-
-    # Acetate
-    kT_arh = Arc*np.exp(-Ea/(R*Tf)) # -L/(mol-s)-
-    # Xylan
-    kT_arh_X = Arc_X*np.exp(-Ea_X/(R*Tf)) # -L/(mol-s)-
-    # Define Rate Equation
-    # Lignin
-    dligdt = kT_arh_L*y[3]*y[1] # -mol/L-s-
-    # Change value
-    dClig_dt = -dligdt
-    dCslig_dt = +dligdt
-    # Acetate
-    dacedt = kT_arh*y[0]*y[1] # -mol/L-s-
-    # Change value
-    dCacy_dt = -dacedt
-    dCace_dt = +dacedt
-    # Xylan
-    dxydt = kT_arh_X*y[5]*y[1] # -mol/L-s-
-    dCxyo_dt = +dxydt
-    dCxy_dt = -dxydt
-    dCOH_dt  =-(dacedt+(1.2*dligdt)+(dxydt))
-    return [dCacy_dt, dCOH_dt, dCace_dt, dClig_dt, dCslig_dt, dCxy_dt, dCxyo_dt]
-
+###############################################
 ###############################################
 ### INTEGRATE
 def deacetylate(ve_params,verbose=True,show_plots=True):
     print("doing deacetylation..")
-    Tf=ve_params.pt_in['deacetylation temperature']
+
+    # Read VE Inputs
+    Tf=ve_params.pt_in['deacetylation_temperature']
     Acy_P = ve_params.pt_in['acetylfrac']
-    t_span = (0,t_final)
-    t_span = (0,t_final)
+    fis_in = float(ve_params.pt_in['initial_solid_fraction'])
+    fis_dac = float(ve_params.pt_in.get('deacetylation_solid_fraction', fis_in))
+
+    # Initial Conditions
     Cacetyl = M_DAC[0,6]
     COH = M_DAC[0,10]
     Cace = M_DAC[0,0]
@@ -241,70 +170,124 @@ def deacetylate(ve_params,verbose=True,show_plots=True):
     Cxyoh = 0
     Clig = M_DAC[0,5]
     Cslig = 0
+    t_span = (0,t_final)
     y0 = [Cacetyl, COH, Cace, Clig, Cslig, Cxy, Cxyo]
+
+    def DACy(t, y):
+        # Arrehnius Rate Kinetics
+        ################################
+        # Lignin
+        kT_arh_L = Arc_L*np.exp(-Ea_L/(R*Tf)) # -L/(mol-s)-
+        # Acetate
+        kT_arh = Arc*np.exp(-Ea/(R*Tf)) # -L/(mol-s)-
+        # Xylan
+        kT_arh_X = Arc_X*np.exp(-Ea_X/(R*Tf)) # -L/(mol-s)-
+
+        # Define Rate Equation
+        ################################
+        # Lignin
+        dligdt = kT_arh_L*y[3]*y[1] # -mol/L-s-
+        # Change value
+        dClig_dt = -dligdt
+        dCslig_dt = +dligdt
+        # Acetate
+        dacedt = kT_arh*y[0]*y[1] # -mol/L-s-
+        # Change value
+        dCacy_dt = -dacedt
+        dCace_dt = +dacedt
+        # Xylan
+        dxydt = kT_arh_X*y[5]*y[1] # -mol/L-s-
+        dCxyo_dt = +dxydt
+        dCxy_dt = -dxydt
+        # Final Hydroxide Stoichiometry
+        dCOH_dt  =-(dacedt+(1.2*dligdt)+(dxydt))
+        return [dCacy_dt, dCOH_dt, dCace_dt, dClig_dt, dCslig_dt, dCxy_dt, dCxyo_dt]
+
+    # Integrate
     sol_DA = solve_ivp(DACy,t_span, y0, method='BDF', rtol=1e-6, atol=1e-9)
 
-    ############################################
-    # EXPERIMENTAL TIME POINTS
-    ############################################
-    times = np.array([0,5,10,15,20,25,30,40,50,60,70,80,90,100,110,120], dtype=int)
+    # Retreive Final Value
+    Cacetyl_f, COH_f, Cace_f, Clig_f, Cslig_f, Cxy_f, Cxyo_f = [float(sol_DA.y[i, -1]) for i in range(7)]
 
-    # Acetate Experimental Time Points
-    acetate_interp = np.interp(times, sol_DA.t/60, sol_DA.y[2]*M_ace)
-    acetyl_interp = np.interp(times, sol_DA.t/60, sol_DA.y[0]*M_acy)
-    DAC_exp_ace = np.vstack((times, acetate_interp, acetyl_interp)).T
-
-    Macetate_interp = np.interp(times, sol_DA.t/60, sol_DA.y[2])
-    Macetyl_interp = np.interp(times, sol_DA.t/60, sol_DA.y[0])
-
-    # Lignin Experimental Time Points
-    lignin_interp = np.interp(times, sol_DA.t/60, sol_DA.y[3]*M_Lig)
-    Slignin_interp = np.interp(times, sol_DA.t/60, sol_DA.y[4]*M_Lig)
-    DAC_exp_lig = np.vstack((times, Slignin_interp, lignin_interp)).T
-
-    # Xylan Experimental Time Points
-    Xylan_interp = np.interp(times, sol_DA.t/60, sol_DA.y[5]*M_Hem)
-    Xylose_interp = np.interp(times, sol_DA.t/60, sol_DA.y[6]*M_X)
-    OH_interp = np.interp(times, sol_DA.t/60, sol_DA.y[1]*M_NaOH)
-    DAC_exp_xyo = np.vstack((times, Xylan_interp, Xylose_interp)).T
-
-    # pH Experimental Time Points
+    # pH Calculation
+    #############################################
     # Calculate pKw
     Hnot0 = 55.83
     Kw2 = 10**(-14)*((Hnot0/R)*((1/289.15)-(1/Tf)))
     pKw = -np.log10(Kw2)
-    OH_interp = np.interp(times, sol_DA.t/60, sol_DA.y[1]*M_OH)
-    pH = pKw+np.log10(OH_interp)
-    DAC_exp_pH = np.vstack((times, pH)).T
+    OH_final = sol_DA.y[1, -1] * M_OH
+    pH = pKw+np.log10(OH_final)
+
+    # Yield Calculations
+    #################################################
+    Cace_f_gL = Cace_f * M_ace
+    ace_yield = Cace_f_gL / C_ace_max # acetate yield
+    Clig_f_gL = Clig_f * M_Lig
+    lig_yield = Clig_f_gL / C_lig_max # total lignin yield
+    Cxy_f_gL = Cxy_f * M_X
+    xyl_yield = Cxy_f_gL / C_xyo_max # total xylose yield
+
+    # Dewatering Calculations
+    #################################################
+    # Avoid divide-by-zero / nonsense
+    if fis_dac <= 0 or fis_dac >= 1 or fis_in <= 0 or fis_in >= 1:
+        s = 1.0
+    else:
+        s = ((1.0 - fis_dac) / (1.0 - fis_in)) * (fis_in / fis_dac)
+    # Liquid concentrations increase when liquid decreases
+    Cxy_f_dw  = Cxy_f  / s
+    Cxyo_f_dw = Cxyo_f / s
+    Cace_f_dw = Cace_f / s
 
 
-    ############################################
-    # CREATE GRAPHS
-    ############################################
-    # Acetate
-    '''plt.plot(sol_DA.t/60, sol_DA.y[2]*M_ace,color=(1, 0.5, 0.8))
-    plt.title('Deacetylation Time Profile')
-    plt.xlabel('Time (min)')
-    plt.ylabel('Species Concentration (g/L)')
-    plt.show() 
+    if not hasattr(ve_params, "pt_out") or ve_params.pt_out is None:
+        ve_params.pt_out = {}
 
-    # Lignin
-    plt.plot(sol_DA.t/60, sol_DA.y[4]*M_Lig,color=(0.1, 0.3, 0.7))
-    plt.title('Lignin Solubilization Time Profile')
-    plt.xlabel('Time (min)')
-    plt.ylabel('Species Concentration (g/L)')
-    plt.show() 
+        # standard VE pretreatment outputs expected downstream
+        ve_params.pt_out["fis_0"] = fis_dac
+        ve_params.pt_out["X_X"]   = float(ve_params.feedstock["xylan_solid_fraction"])
+        ve_params.pt_out["X_G"]   = float(ve_params.feedstock["glucan_solid_fraction"])
+        ve_params.pt_out["conv"]  = 0.0
+        # Furfural
+        ve_params.pt_out["rho_f"] = 0.0
+        # pH
+        ve_params.pt_out["pH_final"] = float(pH_final)
+        # Theoretical Maximum Yield
+        ve_params.pt_out["C_ace_max_gL"] = float(C_ace_max)
+        ve_params.pt_out["C_lig_max_gL"] = float(C_lig_max)
+        ve_params.pt_out["C_xyo_max_gL"] = float(C_xyo_max)
+        # Actual Yield 
+        ve_params.pt_out["ace_yield"] = float(ace_yield)
+        ve_params.pt_out["lig_yield"] = float(lig_yield)
+        ve_params.pt_out["xyl_yield"] = float(xyl_yield)
+        # Final Concentration - before dewatering
+        ve_params.pt_out["Cace_final_gL_pre_dewater"] = float(Cace_f_gL)
+        ve_params.pt_out["Clig_final_gL_pre_dewater"] = float(Clig_f_gL)
+        ve_params.pt_out["Cxy_final_gL_pre_dewater"]  = float(Cxy_f_gL)
+        # Final Concentration - after dewatering
+        ve_params.pt_out["Cxy_final_dewatered"]  = float(Cxy_f_dw)
+        ve_params.pt_out["Cxyo_final_dewatered"] = float(Cxyo_f_dw)
+        ve_params.pt_out["Cace_final_dewatered"] = float(Cace_f_dw)
+    
+    return ve_params.pt_out
 
-    # Xylose
-    plt.plot(times, DAC_exp_xyo[:,2],color=(0, 0.7, 0.3))
-    plt.title('Xylose Time Profile')
-    plt.xlabel('Time (min)')
-    plt.ylabel('Species Concentration (g/L)')
-    plt.show() 
+if __name__ == "__main__":
+    class DummyVE:
+        def __init__(self):
+            self.pt_in = {
+                "deacetylation_temperature": 350.0,
+                "acetylfrac": 0.5,
+                "initial_solid_fraction": 0.2,
+                "deacetylation_solid_fraction": 0.3,
+            }
+            self.feedstock = {
+                "xylan_solid_fraction": 0.25,
+                "glucan_solid_fraction": 0.35,
+            }
+            self.pt_out = {}
 
-    # pH
-    plt.plot(times, DAC_exp_pH[:,1],color=(1, 0.5, 0.5))
-    plt.title('pH Time Profile')
-    plt.xlabel('Time (min)')
-    plt.ylabel('Species Concentration (g/L)')
-    plt.show()'''
+    ve = DummyVE()
+    deacetylate(ve, verbose=True, show_plots=False)
+    print("pt_out keys:", ve.pt_out.keys())
+    for k, v in ve.pt_out.items():
+        print(k, v)

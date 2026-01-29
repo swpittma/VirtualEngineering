@@ -270,14 +270,9 @@ class Pretreatment:
             print('\nRunning deacetylation pretreatment')
         sys.path.append(os.path.join(self.pt_module_path, 'deacetylation_model'))
         from deacetylation import deacetylate
-        deacetylate(self.ve,verbose,self.show_plots)
-        self.ve.pt_out = {}
-        self.ve.pt_out['X_X']=self.ve.feedstock['xylan_solid_fraction']
-        self.ve.pt_out['X_G']=self.ve.feedstock['glucan_solid_fraction']
-        self.ve.pt_out['conv']=0.0
-        self.ve.pt_out["fis_0"] = self.ve.pt_in['initial_solid_fraction']
-        self.ve.pt_out["rho_f"] = 0.0
-        self.ve.pt_out["rho_x"]=730.0
+
+        deacetylate(self.ve, verbose, self.show_plots)
+        # deacetylate() will populate pt(out).
         return True
 
 ###################################################################################
