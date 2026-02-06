@@ -31,6 +31,8 @@ def build_fs_options():
 def build_pt_options():
     pt_options = WidgetCollection()
 
+    pt_options.model_type = widgets.RadioButtons(
+        options = ['dilute acid', 'deacetylation'], value = 'dilute acid')
     pt_options.initial_acid_conc = OptimizationWidget('BoundedFloatText', {'value': 0.0001*1e-6})
     pt_options.steam_temperature = OptimizationWidget('BoundedFloatText', {'value':  150.0, 'max': 300.0})
     pt_options.initial_solid_fraction = OptimizationWidget('BoundedFloatText', {'value': 0.745})
@@ -126,6 +128,9 @@ def test_br_init(build_br_options):
 def test_pt_run(build_pt_options):
     pt_options = build_pt_options
     PT_model = Pretreatment(pt_options, hpc_run=False)
+    for k in range(10):
+        print("eky")
+    print(dir(PT_model))
     PT_model.run(verbose=False, show_plots=False)
     for k, it in PT_model.ve.pt_out.items():
         print(k, it)
