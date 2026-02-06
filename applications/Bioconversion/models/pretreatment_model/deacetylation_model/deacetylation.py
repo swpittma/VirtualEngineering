@@ -251,7 +251,7 @@ def deacetylate(ve_params,verbose=True,show_plots=True):
         # Furfural
         ve_params.pt_out["rho_f"] = 0.0
         # pH
-        ve_params.pt_out["pH_final"] = float(pH_final)
+        #ve_params.pt_out["pH_final"] = float(pH_final)
         # Theoretical Maximum Yield
         ve_params.pt_out["C_ace_max_gL"] = float(C_ace_max)
         ve_params.pt_out["C_lig_max_gL"] = float(C_lig_max)

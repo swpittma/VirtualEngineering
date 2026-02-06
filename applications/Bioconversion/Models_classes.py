@@ -205,13 +205,13 @@ class Pretreatment:
     
     @property
     def DAtemp(self):
-        return self.ve.pt_in['deacetylation temperature']
+        return self.ve.pt_in['deacetylation_temperature']
     
     @DAtemp.setter
     def DAtemp(self,a):
         if not 200 < a < 600:
             raise ValueError(f"Value {a} is outside allowed interval (200, 600)")
-        self.ve.pt_in['deacetylation temperature'] = float(a)
+        self.ve.pt_in['deacetylation_temperature'] = float(a)
     
     @property
     def model_type(self):
