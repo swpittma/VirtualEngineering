@@ -268,6 +268,7 @@ def deacetylate(ve_params,verbose=True,show_plots=True):
         ve_params.pt_out["Cxy_final_dewatered"]  = float(Cxy_f_dw)
         ve_params.pt_out["Cxyo_final_dewatered"] = float(Cxyo_f_dw)
         ve_params.pt_out["Cace_final_dewatered"] = float(Cace_f_dw)
+        ve_params.pt_out['rho_x']=float(Cxy_f_dw)
     
     return ve_params.pt_out
 
